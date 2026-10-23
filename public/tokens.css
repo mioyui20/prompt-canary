@@ -1,0 +1,10 @@
+:root {
+  --canvas: #f7f8f2;
+  --panel: #fff;
+  --ink: #30382a;
+  --muted: #919784;
+  --line: #e2e6d9;
+  --yellow: #f5cb4c;
+  --sidebar: #252b23;
+  --mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+}

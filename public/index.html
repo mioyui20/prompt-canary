@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Compare two prompts. Run checks. Catch regressions. A tiny, bilingual AI evaluation lab with a no-key demo."
+    />
+    <meta name="theme-color" content="#f5cb4c" />
+    <title>PromptCanary — Catch the change.</title>
+    <link rel="icon" href="./canary.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./style.css" />
+    <script type="module" src="./app.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main" data-i18n="skip">Skip to workspace</a>
+    <aside class="sidebar">
+      <a class="brand" href="./" aria-label="PromptCanary home"
+        ><img src="./canary.svg" width="36" height="36" alt="" /><span
+          >prompt<span class="brand-light">canary</span
+          ><span class="brand-dot">.</span></span
+        ></a
+      >
+      <div class="workspace-label" data-i18n="workspace">YOUR WORKSPACE</div>
+      <nav aria-label="Workspace" id="navigation">
+        <a class="nav-link active" href="#experiment"
+          ><span class="nav-icon">◫</span
+          ><span data-i18n="experiment">Experiment</span
+          ><span class="nav-key">01</span></a
+        >
+        <a class="nav-link" href="#cases"
+          ><span class="nav-icon">☷</span
+          ><span data-i18n="testCases">Test cases</span
+          ><span class="nav-count" id="nav-count">5</span></a
+        >
+        <a class="nav-link" href="#results"
+          ><span class="nav-icon">▤</span
+          ><span data-i18n="latestReport">Latest report</span></a
+        >
+      </nav>
+      <div class="sidebar-card">
+        <span class="small-dot"></span
+        ><span data-i18n="localFirst">Local by default.</span>
+        <p data-i18n="localCopy">
+          Your workspace stays in this browser. Your API key stays on your
+          server.
+        </p>
+      </div>
+      <div class="sidebar-bottom">
+        <a
+          href="https://github.com/mioyui20/prompt-canary"
+          target="_blank"
+          rel="noreferrer"
+          >GitHub <span>↗</span></a
+        ><a
+          href="https://github.com/mioyui20/prompt-canary#quick-start"
+          target="_blank"
+          rel="noreferrer"
+          ><span data-i18n="documentation">Documentation</span>
+          <span>↗</span></a
+        >
+        <div class="version">v1.0.0 <span>MIT LICENSE</span></div>
+      </div>
+    </aside>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <span class="breadcrumb" data-i18n="workspaceShort">Workspace</span
+          ><span class="breadcrumb-divider">/</span
+          ><span data-i18n="promptComparison">Prompt comparison</span>
+        </div>
+        <div class="topbar-actions">
+          <span class="open-source"
+            ><span class="small-dot"></span
+            ><span data-i18n="openSource">Open source</span></span
+          ><button
+            class="language-button"
+            id="language"
+            type="button"
+            aria-label="Switch to Chinese"
+          >
+            中文 <span>⇄</span>
+          </button>
+        </div>
+      </header>
+      <main id="main">
+        <section class="hero" id="experiment">
+          <div>
+            <div class="eyebrow">
+              <span class="canary-mark">✦</span
+              ><span data-i18n="eyebrow"
+                >A LITTLE CONFIDENCE BEFORE YOU SHIP</span
+              >
+            </div>
+            <h1 data-i18n="headline">
+              Small prompts.<br />Visible differences.
+            </h1>
+            <p class="hero-copy" data-i18n="heroCopy">
+              Compare two versions. Check the edge cases.<br />Find what got
+              better — and what quietly broke.
+            </p>
+          </div>
+          <div class="hero-action">
+            <span class="demo-pill" id="hero-status"
+              ><span class="small-dot"></span
+              ><span data-i18n="noKey">No API key needed for demo</span></span
+            ><button class="button primary run-button" id="run" type="button">
+              <span class="play-icon">▶</span
+              ><span data-i18n="runDemo">Run demo comparison</span
+              ><span class="button-arrow">↗</span></button
+            ><button
+              class="button cancel-button"
+              id="cancel"
+              type="button"
+              hidden
+              data-i18n="cancel"
+            >
+              Cancel run</button
+            ><span class="run-hint" id="run-hint" data-i18n="runHint"
+              >5 test cases · 2 prompt versions · zero setup</span
+            >
+          </div>
+        </section>
+        <section class="control-bar" aria-label="Evaluation setup">
+          <div class="control-group">
+            <label for="preset" data-i18n="starter">STARTER</label
+            ><select id="preset">
+              <option value="support" data-i18n="supportPreset">
+                Customer support
+              </option>
+              <option value="extract" data-i18n="extractPreset">
+                JSON extraction
+              </option>
+            </select>
+          </div>
+          <div class="control-group mode-control">
+            <span class="control-label" data-i18n="mode">MODE</span>
+            <div class="segmented" role="group" aria-label="Evaluation mode">
+              <button
+                id="mode-demo"
+                class="selected"
+                type="button"
+                aria-pressed="true"
+                data-i18n="demoMode"
+              >
+                Demo playback</button
+              ><button
+                id="mode-live"
+                type="button"
+                aria-pressed="false"
+                data-i18n="liveMode"
+              >
+                Live model
+              </button>
+            </div>
+          </div>
+          <div class="control-group repeat-control">
+            <label for="repeat" data-i18n="repeats">RUNS / CASE</label
+            ><select id="repeat" disabled>
+              <option value="1">1×</option>
+              <option value="2">2×</option>
+              <option value="3">3×</option>
+            </select>
+          </div>
+        </section>
+        <div class="notice" id="mode-notice">
+          <span class="notice-icon">i</span>
+          <p id="notice-text"></p>
+          <button
+            id="configure"
+            class="text-button"
+            type="button"
+            hidden
+            data-i18n="setup"
+          >
+            Setup guide ↗
+          </button>
+        </div>
+        <div class="error-banner" id="error" role="alert" hidden></div>
+        <section class="prompt-grid" aria-label="Prompt editors">
+          <article class="panel prompt-panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <span class="variant-icon baseline">A</span>
+                <h2 data-i18n="baseline">Baseline</h2>
+              </div>
+              <span class="subtle-tag" data-i18n="currentVersion"
+                >CURRENT VERSION</span
+              >
+            </div>
+            <label class="editor-label" for="prompt-a"
+              ><span data-i18n="promptTemplate">PROMPT TEMPLATE</span
+              ><span id="count-a"></span></label
+            ><textarea
+              id="prompt-a"
+              spellcheck="false"
+              maxlength="12000"
+              aria-label="Baseline prompt"
+            ></textarea>
+            <div class="editor-footer">
+              <code>{{input}}</code
+              ><span data-i18n="inputHint"
+                >is replaced with each test input</span
+              >
+            </div>
+          </article>
+          <article class="panel prompt-panel candidate-panel">
+            <div class="panel-heading">
+              <div class="panel-title">
+                <span class="variant-icon candidate">B</span>
+                <h2 data-i18n="candidate">Candidate</h2>
+              </div>
+              <span class="candidate-tag" data-i18n="yourChanges"
+                >YOUR CHANGES</span
+              >
+            </div>
+            <label class="editor-label" for="prompt-b"
+              ><span data-i18n="promptTemplate">PROMPT TEMPLATE</span
+              ><span id="count-b"></span></label
+            ><textarea
+              id="prompt-b"
+              spellcheck="false"
+              maxlength="12000"
+              aria-label="Candidate prompt"
+            ></textarea>
+            <div class="editor-footer">
+              <code>{{input}}</code
+              ><span data-i18n="inputHint"
+                >is replaced with each test input</span
+              >
+            </div>
+          </article>
+        </section>
+        <section class="panel cases-panel" id="cases">
+          <div class="section-heading">
+            <div>
+              <div class="section-eyebrow" data-i18n="testEyebrow">
+                THE SAME INPUTS. A FAIRER COMPARISON.
+              </div>
+              <h2>
+                <span data-i18n="testCases">Test cases</span
+                ><span class="number-tag" id="case-count">5</span>
+              </h2>
+            </div>
+            <div class="section-actions">
+              <button
+                class="button small"
+                id="import"
+                type="button"
+                data-i18n="import"
+              >
+                Import</button
+              ><button
+                class="button small"
+                id="export-suite"
+                type="button"
+                data-i18n="exportSuite"
+              >
+                Export suite</button
+              ><button
+                class="button small"
+                id="edit-json"
+                type="button"
+                data-i18n="editJson"
+              >
+                Edit JSON</button
+              ><button
+                class="button small dark"
+                id="add-case"
+                type="button"
+                data-i18n="addCase"
+              >
+                + Add case
+              </button>
+            </div>
+          </div>
+          <input
+            id="file-input"
+            type="file"
+            accept=".json,application/json"
+            hidden
+          />
+          <div id="case-list"></div>
+          <div id="json-editor-wrap" hidden>
+            <label class="editor-label" for="cases-json" data-i18n="casesJson"
+              >TEST CASES ARRAY · JSON</label
+            ><textarea
+              class="json-editor"
+              id="cases-json"
+              spellcheck="false"
+              aria-label="Test cases JSON"
+            ></textarea>
+            <p class="editor-help" data-i18n="jsonHelp">
+              Edit the cases array. Each case needs an id, input and at least
+              one check. Demo playback also needs demo.a and demo.b fixtures.
+            </p>
+          </div>
+        </section>
+        <section id="results" class="results-section" aria-live="polite">
+          <div class="section-heading results-heading">
+            <div>
+              <div class="section-eyebrow" data-i18n="resultsEyebrow">
+                LESS GUESSWORK. MORE EVIDENCE.
+              </div>
+              <h2 data-i18n="results">Comparison results</h2>
+            </div>
+            <div class="section-actions">
+              <span id="report-meta" class="report-meta"></span
+              ><button
+                class="button small"
+                id="export-json"
+                type="button"
+                disabled
+                data-i18n="jsonReport"
+              >
+                JSON report ↓</button
+              ><button
+                class="button small"
+                id="export-markdown"
+                type="button"
+                disabled
+                data-i18n="markdownReport"
+              >
+                Markdown ↓
+              </button>
+            </div>
+          </div>
+          <div class="empty-state" id="empty">
+            <div class="empty-symbol">↔</div>
+            <h3 data-i18n="emptyTitle">
+              A small change deserves a closer look.
+            </h3>
+            <p data-i18n="emptyCopy">
+              Run your first comparison to see outputs, check results and
+              regressions side by side.
+            </p>
+            <span class="empty-shortcut" data-i18n="shortcut"
+              >Tip: Ctrl / ⌘ + Enter to run</span
+            >
+          </div>
+          <div id="report" hidden></div>
+        </section>
+        <footer class="footer">
+          <span
+            >promptcanary<span class="brand-dot">.</span>
+            <span class="footer-copy" data-i18n="footerCopy"
+              >Small tool. Clearer decisions.</span
+            ></span
+          ><span data-i18n="footerNote"
+            >Rule checks are signals, not a measure of general answer
+            quality.</span
+          >
+        </footer>
+      </main>
+    </div>
+    <dialog id="case-dialog">
+      <form id="case-form">
+        <div class="dialog-header">
+          <h2 data-i18n="addCaseTitle">Add a test case</h2>
+          <button
+            type="button"
+            class="icon-button"
+            id="close-case"
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </div>
+        <label for="case-name" data-i18n="caseName">Name</label
+        ><input id="case-name" required maxlength="160" /><label
+          for="case-input"
+          data-i18n="caseInput"
+          >User input</label
+        ><textarea id="case-input" required maxlength="12000"></textarea
+        ><label for="check-type" data-i18n="checkType">Check</label
+        ><select id="check-type">
+          <option value="contains" data-i18n="rule_contains">
+            Contains text
+          </option>
+          <option value="not_contains" data-i18n="rule_not_contains">
+            Excludes text
+          </option>
+          <option value="json" data-i18n="rule_json">Valid JSON</option>
+          <option value="max_length" data-i18n="rule_max_length">
+            Max characters
+          </option></select
+        ><label for="check-value" id="check-value-label" data-i18n="checkValue"
+          >Expected value</label
+        ><input id="check-value" maxlength="4000" required />
+        <p class="editor-help" data-i18n="newCaseHint">
+          New cases run in live mode. For offline playback, add recorded outputs
+          through Edit JSON.
+        </p>
+        <button type="submit" class="button primary" data-i18n="saveCase">
+          Add test case
+        </button>
+      </form>
+    </dialog>
+    <dialog id="setup-dialog">
+      <div class="dialog-header">
+        <h2 data-i18n="setupTitle">Connect your model</h2>
+        <button
+          class="icon-button"
+          id="close-setup"
+          type="button"
+          aria-label="Close"
+        >
+          ×
+        </button>
+      </div>
+      <p data-i18n="setupCopy">
+        Run PromptCanary locally. Copy .env.example to .env, fill in your
+        provider settings, then restart the server.
+      </p>
+      <pre>
+LLM_BASE_URL=https://api.deepseek.com
+LLM_MODEL=your-model-id
+LLM_API_KEY=your-api-key</pre>
+      <p data-i18n="setupLocal">
+        Local compatible servers can use an HTTP localhost endpoint without an
+        API key. Model calls leave your machine for the configured provider.
+      </p>
+      <p class="editor-help" data-i18n="setupStatic">
+        The hosted demo supports fixture playback only. Live calls require the
+        local Node.js server.
+      </p>
+      <a
+        class="button dark"
+        href="https://github.com/mioyui20/prompt-canary#quick-start"
+        target="_blank"
+        rel="noreferrer"
+        data-i18n="readGuide"
+        >Read setup guide ↗</a
+      >
+    </dialog>
+    <div class="toast" id="toast" role="status" hidden></div>
+  </body>
+</html>

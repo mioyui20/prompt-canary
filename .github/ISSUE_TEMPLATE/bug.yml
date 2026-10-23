@@ -1,0 +1,23 @@
+name: Bug report / 问题反馈
+description: Help reproduce a concrete problem / 帮助复现具体问题
+body:
+  - type: markdown
+    attributes:
+      value: Please remove API keys and private inputs from screenshots and reports. / 请移除截图和报告中的密钥与私人输入。
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      placeholder: Describe the mode, suite, steps, expected result and actual result. / 描述运行模式、测试集、操作步骤、预期和实际结果。
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment / 环境
+      placeholder: OS, browser, Node.js version / 系统、浏览器、Node.js 版本
+  - type: textarea
+    id: sample
+    attributes:
+      label: Minimal sanitized suite or report / 最小脱敏测试集或报告
+      render: json

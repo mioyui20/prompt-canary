@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "name": "Structured extraction",
+  "prompts": {
+    "a": "Extract the information:\n{{input}}",
+    "b": "Return valid JSON only, no markdown. Fields: name, email, priority (low or high). Set priority to high when the text says urgent; otherwise low. Use null for missing values.\nText: {{input}}"
+  },
+  "cases": [
+    {
+      "id": "extract-1",
+      "name": "Basic contact",
+      "input": "Name: Alex, email: alex@example.com",
+      "checks": [
+        {
+          "type": "json"
+        },
+        {
+          "type": "json_path",
+          "path": "email",
+          "value": "alex@example.com"
+        }
+      ],
+      "demo": {
+        "a": "Alex can be reached at alex@example.com.",
+        "b": "{\"name\":\"Alex\",\"email\":\"alex@example.com\",\"priority\":\"low\"}"
+      }
+    },
+    {
+      "id": "extract-2",
+      "name": "Urgent request",
+      "input": "URGENT: Sam, sam@example.com needs help.",
+      "checks": [
+        {
+          "type": "json"
+        },
+        {
+          "type": "json_path",
+          "path": "priority",
+          "value": "high"
+        }
+      ],
+      "demo": {
+        "a": "{\"name\":\"Sam\",\"email\":\"sam@example.com\",\"priority\":\"low\"}",
+        "b": "{\"name\":\"Sam\",\"email\":\"sam@example.com\",\"priority\":\"high\"}"
+      }
+    },
+    {
+      "id": "extract-3",
+      "name": "Missing field",
+      "input": "Name: Jo. No email provided.",
+      "checks": [
+        {
+          "type": "json"
+        },
+        {
+          "type": "json_path",
+          "path": "email",
+          "value": null
+        }
+      ],
+      "demo": {
+        "a": "{\"name\":\"Jo\",\"email\":null,\"priority\":\"low\"}",
+        "b": "{\"name\":\"Jo\",\"email\":null,\"priority\":\"low\"}"
+      }
+    }
+  ]
+}

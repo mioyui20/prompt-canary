@@ -1,0 +1,14 @@
+name: Feature idea / 功能建议
+description: A focused improvement / 小而明确的改进
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem would this solve? / 解决什么问题？
+      description: Include a concrete example. / 请给出具体场景。
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior / 期望的行为

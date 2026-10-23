@@ -1,0 +1,16 @@
+{
+  "name": "prompt-canary",
+  "version": "1.0.0",
+  "description": "A tiny, bilingual prompt A/B testing lab. Catch regressions before they ship.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20.19.0" },
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test",
+    "demo": "node src/cli.js --suite examples/support.en.json --demo",
+    "check": "node scripts/check.js"
+  },
+  "license": "MIT"
+}

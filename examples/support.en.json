@@ -1,0 +1,89 @@
+{
+  "version": 1,
+  "name": "Support replies · prompt regression suite",
+  "prompts": {
+    "a": "You are a friendly customer support assistant. Answer the customer.\n\nCustomer: {{input}}",
+    "b": "You are a careful customer support assistant.\nRules:\n1. Refund requests require an order ID. Ask for it when missing.\n2. Never guarantee instant refunds or invent payment status.\n3. Never request passwords. Tell the customer not to share passwords when relevant.\n4. Keep replies under 300 characters.\n\nCustomer: {{input}}"
+  },
+  "cases": [
+    {
+      "id": "missing-order",
+      "name": "Missing order ID",
+      "input": "I want a refund, but I cannot find my order.",
+      "checks": [
+        {
+          "type": "contains",
+          "value": "order ID"
+        }
+      ],
+      "demo": {
+        "a": "Absolutely! I will process your refund right away.",
+        "b": "Please share your order ID so we can check the refund request. You can find it in your confirmation email."
+      }
+    },
+    {
+      "id": "no-guarantees",
+      "name": "No false promises",
+      "input": "Will my refund arrive right now?",
+      "checks": [
+        {
+          "type": "not_contains",
+          "value": "guaranteed instant refund"
+        }
+      ],
+      "demo": {
+        "a": "Yes, you will get a guaranteed instant refund!",
+        "b": "Refund timing depends on the payment provider and review status. Please share your order ID so we can check."
+      }
+    },
+    {
+      "id": "password",
+      "name": "Sensitive information",
+      "input": "Do you need my account password?",
+      "checks": [
+        {
+          "type": "contains",
+          "value": "do not share passwords"
+        }
+      ],
+      "demo": {
+        "a": "Please do not share passwords. Only your order information is needed.",
+        "b": "Please do not share passwords. An order ID is enough to start checking your request."
+      }
+    },
+    {
+      "id": "short-answer",
+      "name": "Concise response",
+      "input": "How do I check a canceled order?",
+      "checks": [
+        {
+          "type": "max_length",
+          "value": 300
+        }
+      ],
+      "demo": {
+        "a": "Open the order details page to see the cancellation status. Share your order ID if you need help.",
+        "b": "Open the order details page to check its status. Share your order ID if you would like further help."
+      }
+    },
+    {
+      "id": "order-provided",
+      "name": "Known order ID",
+      "input": "My order ID is AB123. Can you check my refund?",
+      "checks": [
+        {
+          "type": "contains",
+          "value": "AB123"
+        },
+        {
+          "type": "not_contains",
+          "value": "already refunded"
+        }
+      ],
+      "demo": {
+        "a": "Thanks for sharing AB123. I can help you check the refund status.",
+        "b": "Thanks for sharing AB123. I cannot verify payment status here. Please check the order page or contact the support team."
+      }
+    }
+  ]
+}

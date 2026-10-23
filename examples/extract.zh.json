@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "name": "结构化信息提取",
+  "prompts": {
+    "a": "提取信息：\n{{input}}",
+    "b": "只输出有效 JSON，不要 Markdown。返回 name（姓名）、email（邮箱）、priority（low 或 high）。包含紧急或 urgent 时 priority 为 high，否则为 low。缺失值用 null。\n文本：{{input}}"
+  },
+  "cases": [
+    {
+      "id": "extract-1",
+      "name": "基本联系人",
+      "input": "Name: Alex, email: alex@example.com",
+      "checks": [
+        {
+          "type": "json"
+        },
+        {
+          "type": "json_path",
+          "path": "email",
+          "value": "alex@example.com"
+        }
+      ],
+      "demo": {
+        "a": "Alex can be reached at alex@example.com.",
+        "b": "{\"name\":\"Alex\",\"email\":\"alex@example.com\",\"priority\":\"low\"}"
+      }
+    },
+    {
+      "id": "extract-2",
+      "name": "紧急请求",
+      "input": "URGENT: Sam, sam@example.com needs help.",
+      "checks": [
+        {
+          "type": "json"
+        },
+        {
+          "type": "json_path",
+          "path": "priority",
+          "value": "high"
+        }
+      ],
+      "demo": {
+        "a": "{\"name\":\"Sam\",\"email\":\"sam@example.com\",\"priority\":\"low\"}",
+        "b": "{\"name\":\"Sam\",\"email\":\"sam@example.com\",\"priority\":\"high\"}"
+      }
+    },
+    {
+      "id": "extract-3",
+      "name": "缺失字段",
+      "input": "Name: Jo. No email provided.",
+      "checks": [
+        {
+          "type": "json"
+        },
+        {
+          "type": "json_path",
+          "path": "email",
+          "value": null
+        }
+      ],
+      "demo": {
+        "a": "{\"name\":\"Jo\",\"email\":null,\"priority\":\"low\"}",
+        "b": "{\"name\":\"Jo\",\"email\":null,\"priority\":\"low\"}"
+      }
+    }
+  ]
+}
